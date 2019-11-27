@@ -11,7 +11,10 @@ public class Rocket : MonoBehaviour
     [SerializeField] float rcsThrust = 100f;
     [SerializeField] float fuelLossThrust = 0.1f;
     [SerializeField] float maxFuel = 100f;
+
     float currentFuel;
+    public float CurrentFuel { get => currentFuel; set => currentFuel = value; }
+    
 
     // Start is called before the first frame update
     void Start()
@@ -44,7 +47,8 @@ public class Rocket : MonoBehaviour
                 break;
             case "Finish":
                 print("WIN");
-
+                break;
+            case "Friendly":
                 break;
             default:
                 print("dead");
@@ -60,7 +64,6 @@ public class Rocket : MonoBehaviour
             {
                 rigidBody.AddRelativeForce(Vector3.up * fwdThrust);
                 currentFuel -= fuelLossThrust;
-                print(currentFuel);
 
                 if (!engineAudio.isPlaying)
                 {
