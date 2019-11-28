@@ -10,11 +10,13 @@ public class Rocket : MonoBehaviour
     [SerializeField] float fwdThrust = 1f;
     [SerializeField] float rcsThrust = 100f;
     [SerializeField] float fuelLossThrust = 0.1f;
-    [SerializeField] float maxFuel = 100f;
-
-    float currentFuel;
-    public float CurrentFuel { get => currentFuel; set => currentFuel = value; }
     
+    [SerializeField] float maxFuel = 100f;    
+    float currentFuel;
+
+    public float CurrentFuel { get => currentFuel; set => currentFuel = value; }
+    public float MaxFuel { get => maxFuel; set => maxFuel = value; }
+
 
     // Start is called before the first frame update
     void Start()
@@ -37,14 +39,7 @@ public class Rocket : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         switch (collision.gameObject.tag)
-        {
-            case "Fuel":
-                if (currentFuel + 20 > maxFuel)
-                    currentFuel = maxFuel;
-                else
-                    currentFuel += 20f;
-                GameObject.Destroy(collision.gameObject);
-                break;
+        {            
             case "Finish":
                 print("WIN");
                 break;
@@ -84,11 +79,11 @@ public class Rocket : MonoBehaviour
         //Can only turn one direction
         if (Input.GetKey(KeyCode.A))
         {            
-            transform.Rotate(Vector3.forward * rotationThisFrame);            
+            transform.Rotate(Vector3.left * rotationThisFrame);            
         }
         else if (Input.GetKey(KeyCode.D))
         {        
-            transform.Rotate(-Vector3.forward * rotationThisFrame);
+            transform.Rotate(Vector3.right * rotationThisFrame);
         }
 
         rigidBody.freezeRotation = false; //resume physics control of rotation
