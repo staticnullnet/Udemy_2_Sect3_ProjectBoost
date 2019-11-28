@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
@@ -9,7 +7,7 @@ public class Rocket : MonoBehaviour
     AudioSource engineAudio;
     [SerializeField] float fwdThrust = 1f;
     [SerializeField] float rcsThrust = 100f;
-    [SerializeField] float fuelLossThrust = 0.1f;
+    [SerializeField] float fuelLossThrust = 0.05f;
     
     [SerializeField] float maxFuel = 100f;    
     float currentFuel;
@@ -42,11 +40,12 @@ public class Rocket : MonoBehaviour
         {            
             case "Finish":
                 print("WIN");
+                SceneManager.LoadScene(1);
                 break;
             case "Friendly":
                 break;
             default:
-                print("dead");
+                SceneManager.LoadScene(0);
                 break;
         }
     }
@@ -73,19 +72,26 @@ public class Rocket : MonoBehaviour
     }
     private void Rotate()
     {
-        rigidBody.freezeRotation = true; //take manual control of rotation        
-        float rotationThisFrame = rcsThrust * Time.deltaTime;
+        if (currentFuel > 0)
+        {
+            rigidBody.freezeRotation = true; //take manual control of rotation        
+            float rotationThisFrame = rcsThrust * Time.deltaTime;
 
-        //Can only turn one direction
-        if (Input.GetKey(KeyCode.A))
-        {            
-            transform.Rotate(Vector3.left * rotationThisFrame);            
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {        
-            transform.Rotate(Vector3.right * rotationThisFrame);
-        }
+            //Can only turn one direction
+            if (Input.GetKey(KeyCode.A))
+            {
+                transform.Rotate(Vector3.left * rotationThisFrame);
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                transform.Rotate(Vector3.right * rotationThisFrame);
+            }
 
-        rigidBody.freezeRotation = false; //resume physics control of rotation
+            rigidBody.freezeRotation = false; //resume physics control of rotation
+        }
+        else
+        {
+            engineAudio.Stop();
+        }
     }
 }

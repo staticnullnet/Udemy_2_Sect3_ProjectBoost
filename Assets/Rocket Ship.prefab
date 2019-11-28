@@ -184,19 +184,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!65 &781222055
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5642650196084952483}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.8892368, y: 0.949394, z: 4.0148263}
-  m_Center: {x: 1.7379433, y: 0.047611, z: 0.248377}
 --- !u!1 &7103716379922015103
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,9 +288,10 @@ GameObject:
   - component: {fileID: 1743850824065741962}
   - component: {fileID: 5992064703718985022}
   - component: {fileID: 5574297521698270215}
+  - component: {fileID: 1786726055}
   m_Layer: 0
   m_Name: Rocket Ship
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -335,9 +323,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7103716381089669288}
   serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 2
-  m_AngularDrag: 0.05
+  m_Mass: 0.05
+  m_Drag: 10
+  m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -451,10 +439,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53a109693cefe534795b80745d31c423, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fwdThrust: 25
+  fwdThrust: 4
   rcsThrust: 100
   fuelLossThrust: 0.5
   maxFuel: 100
+--- !u!65 &1786726055
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103716381089669288}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2.2646396, y: 4.036206, z: 1}
+  m_Center: {x: -0.044712782, y: -0.6504125, z: 0}
 --- !u!1 &9118959858204776509
 GameObject:
   m_ObjectHideFlags: 0
@@ -562,12 +563,12 @@ PrefabInstance:
     - target: {fileID: -4216859302048453862, guid: 23ba8fd48be741a43b408b534eef03ba,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.03
+      value: -2.049
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 23ba8fd48be741a43b408b534eef03ba,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.963
+      value: -0.831
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 23ba8fd48be741a43b408b534eef03ba,
         type: 3}
@@ -629,12 +630,6 @@ PrefabInstance:
 --- !u!4 &2889528662200195629 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 23ba8fd48be741a43b408b534eef03ba,
-    type: 3}
-  m_PrefabInstance: {fileID: 7882178737206800695}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5642650196084952483 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2534866581884222612, guid: 23ba8fd48be741a43b408b534eef03ba,
     type: 3}
   m_PrefabInstance: {fileID: 7882178737206800695}
   m_PrefabAsset: {fileID: 0}
