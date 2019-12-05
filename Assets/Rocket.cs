@@ -1,97 +1,107 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour
 {
     Rigidbody rigidBody;
     AudioSource engineAudio;
-    [SerializeField] float fwdThrust = 1f;
-    [SerializeField] float rcsThrust = 100f;
-    [SerializeField] float fuelLossThrust = 0.05f;
-    
-    [SerializeField] float maxFuel = 100f;    
-    float currentFuel;
-
-    public float CurrentFuel { get => currentFuel; set => currentFuel = value; }
+    [SerializeField] float fwdThrust = 1f; //Forward Thrust coefficient
+    [SerializeField] float rcsThrust = 100f; //Rotation Thrust coefficient
+    [SerializeField] float fuelLossThrust = 0.05f; //fuel loss coefficient    
+    [SerializeField] float maxFuel = 100f; //maximum fuel coefficient
+    State state = State.Alive;
+    enum State { Alive, Transcending, Dieing };
+    public float CurrentFuel { get; set; }
     public float MaxFuel { get => maxFuel; set => maxFuel = value; }
-
-
+        
     // Start is called before the first frame update
     void Start()
-    {
+    {        
         rigidBody = GetComponent<Rigidbody>();
         engineAudio = GetComponent<AudioSource>();
-        //fuelCounter = GetComponent<Text>();
-
-        currentFuel = maxFuel;
+        CurrentFuel = MaxFuel;
         
     }
 
     // Update is called once per frame
     void Update()
     {
-        Thrust();
-        Rotate();        
+        if (state == State.Alive)
+        {
+            Thrust();
+            Rotate();
+        }
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        if (state != State.Alive) { return; }
+
         switch (collision.gameObject.tag)
         {            
             case "Finish":
-                print("WIN");
-                SceneManager.LoadScene(1);
+                state = State.Transcending;
+                Invoke("LoadNextLevel", 1f); //Better to use coroutines. StartCoroutine("LoadNextScene(1)"); ??WIP 
                 break;
             case "Friendly":
                 break;
             default:
-                SceneManager.LoadScene(0);
+                state = State.Transcending;
+                Invoke("LoadFirstLevel", 1f); //Better to use coroutines. StartCoroutine("LoadNextScene(1)"); ??WIP 
                 break;
         }
     }
 
+    private void LoadNextLevel()
+    {        
+        SceneManager.LoadScene(1);
+    }
+
+    private void LoadFirstLevel()
+    {
+        SceneManager.LoadScene(0);
+    }
+
     private void Thrust()
     {
-        if (Input.GetKey(KeyCode.Space)) //Can thrust while rotating
+        if (Input.GetKey(KeyCode.Space) && CurrentFuel > 0) //Can thrust while rotating
         {
-            if (currentFuel > 0)
-            {
-                rigidBody.AddRelativeForce(Vector3.up * fwdThrust);
-                currentFuel -= fuelLossThrust;
+            
+            rigidBody.AddRelativeForce(Vector3.up * fwdThrust);
+            CurrentFuel -= fuelLossThrust;
 
-                if (!engineAudio.isPlaying)
-                {
-                    engineAudio.Play();
-                }
+            if (!engineAudio.isPlaying)
+            {
+                engineAudio.Play();
             }
         }
         else
         {
-            engineAudio.Stop();
+            engineAudio..Stop();
         }
     }
     private void Rotate()
     {
-        if (currentFuel > 0)
-        {
-            rigidBody.freezeRotation = true; //take manual control of rotation        
-            float rotationThisFrame = rcsThrust * Time.deltaTime;
-
-            //Can only turn one direction
-            if (Input.GetKey(KeyCode.A))
-            {
-                transform.Rotate(Vector3.left * rotationThisFrame);
-            }
-            else if (Input.GetKey(KeyCode.D))
-            {
-                transform.Rotate(Vector3.right * rotationThisFrame);
-            }
-
-            rigidBody.freezeRotation = false; //resume physics control of rotation
-        }
-        else
+        if (CurrentFuel <= 0)
         {
             engineAudio.Stop();
+            return;
         }
+
+        rigidBody.freezeRotation = true; //take manual control of rotation        
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
+
+        //Can only turn one direction
+        if (Input.GetKey(KeyCode.A))
+        {
+            transform.Rotate(Vector3.left * rotationThisFrame);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            transform.Rotate(Vector3.right * rotationThisFrame);
+        }
+
+        rigidBody.freezeRotation = false; //resume physics control of rotation
     }
 }
