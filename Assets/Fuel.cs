@@ -21,10 +21,10 @@ public class Fuel : MonoBehaviour
 
         if (other.gameObject.TryGetComponent<Rocket> (out Rocket rocket))
         {            
-            if (rocket.CurrentFuel + 20 > rocket.MaxFuel)
+            if (rocket.CurrentFuel + 40 > rocket.MaxFuel)
                 rocket.CurrentFuel = rocket.MaxFuel;
             else
-                rocket.CurrentFuel += 20f;
+                rocket.CurrentFuel += 40f;
 
             GameObject.Destroy(this.gameObject);
         }

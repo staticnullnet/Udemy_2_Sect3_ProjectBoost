@@ -20,7 +20,9 @@ public class Rocket : MonoBehaviour
     [SerializeField] float rcsThrust = 100f; //Rotation Thrust coefficient
     [SerializeField] float fuelLossThrust = 0.05f; //fuel loss coefficient    
     [SerializeField] float maxFuel = 100f; //maximum fuel coefficient
-    
+
+    [SerializeField] float levelLoadDelay;
+
     State state = State.Alive;
     enum State { Alive, Transcending, Dieing };
     public float CurrentFuel { get; set; }
@@ -70,7 +72,7 @@ public class Rocket : MonoBehaviour
         deathParticles.Play();
         audioSource.Stop();
         audioSource.PlayOneShot(death);
-        Invoke("LoadFirstLevel", 1f); //Better to use coroutines. StartCoroutine("LoadNextScene(1)"); ??WIP 
+        Invoke("LoadFirstLevel", levelLoadDelay); //Better to use coroutines. StartCoroutine("LoadNextScene(1)"); ??WIP 
     }
 
     private void StartSuccessSequence()
@@ -79,7 +81,7 @@ public class Rocket : MonoBehaviour
         succeedParticles.Play();
         audioSource.Stop();
         audioSource.PlayOneShot(succeed);
-        Invoke("LoadNextLevel", 1f); //Better to use coroutines. StartCoroutine("LoadNextScene(1)"); ??WIP 
+        Invoke("LoadNextLevel", levelLoadDelay); //Better to use coroutines. StartCoroutine("LoadNextScene(1)"); ??WIP 
     }
 
     private void LoadNextLevel()
@@ -108,7 +110,7 @@ public class Rocket : MonoBehaviour
 
     private void ApplyThrust()
     {
-        rigidBody.AddRelativeForce(Vector3.up * fwdThrust);
+        rigidBody.AddRelativeForce(Vector3.up * fwdThrust * Time.deltaTime);
         CurrentFuel -= fuelLossThrust;
 
         if (!audioSource.isPlaying)
