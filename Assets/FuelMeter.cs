@@ -19,6 +19,6 @@ public class FuelMeter : MonoBehaviour
     void Update()
     {
         float fuel = rocket.CurrentFuel;        
-        fuelCounter.text = fuel.ToString();
+        fuelCounter.text = ((int)fuel).ToString();
     }
 }
