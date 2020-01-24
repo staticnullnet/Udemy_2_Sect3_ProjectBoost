@@ -16,12 +16,18 @@ public class Oscillator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         startingPos = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
+        
+        //check if two floats are equal
+        //Mathf.Abs(floatA - floabB) <= Mathf.Epsilon;
+
+
         //if (period <= Mathf.Epsilon) { return; }
         //todo protect against divide by 0
         

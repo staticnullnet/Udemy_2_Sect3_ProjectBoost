@@ -19,12 +19,16 @@ public class Rocket : MonoBehaviour
     [SerializeField] float fwdThrust = 1f; //Forward Thrust coefficient
     [SerializeField] float rcsThrust = 100f; //Rotation Thrust coefficient
     [SerializeField] float fuelLossThrust = 0.05f; //fuel loss coefficient    
+
+    [Range (0,100)]
     [SerializeField] float maxFuel = 100f; //maximum fuel coefficient
 
     [SerializeField] float levelLoadDelay;
 
-    State state = State.Alive;
-    enum State { Alive, Transcending, Dieing };
+    bool collisionsDisabled = false;
+    bool infiniteFuel = false;
+    bool isTransitioning = false;    
+
     public float CurrentFuel { get; set; }
     public float MaxFuel { get => maxFuel; set => maxFuel = value; }
         
@@ -42,16 +46,39 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (state == State.Alive)
+        if (!isTransitioning)
         {
             RespondToThrustInput();
             RespondToRotateInput();
+        }
+
+        // only if debug on
+        if (Debug.isDebugBuild)
+        {
+            RespondToDebugKeys();
+        }
+    }
+
+    private void RespondToDebugKeys()
+    {
+        if (Input.GetKey(KeyCode.L))
+        {
+            LoadNextLevel();
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            collisionsDisabled = !collisionsDisabled;
+            //toggle collision
+        }
+        else if (Input.GetKeyDown(KeyCode.G))
+        {
+            infiniteFuel = !infiniteFuel;
         }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        if (state != State.Alive) { return; }
+        if (isTransitioning || collisionsDisabled) { return; }
 
         switch (collision.gameObject.tag)
         {
@@ -68,7 +95,6 @@ public class Rocket : MonoBehaviour
 
     private void StartDeathSequence()
     {
-        state = State.Dieing;
         deathParticles.Play();
         audioSource.Stop();
         audioSource.PlayOneShot(death);
@@ -77,7 +103,7 @@ public class Rocket : MonoBehaviour
 
     private void StartSuccessSequence()
     {
-        state = State.Transcending;
+        isTransitioning = true;
         succeedParticles.Play();
         audioSource.Stop();
         audioSource.PlayOneShot(succeed);
@@ -85,8 +111,18 @@ public class Rocket : MonoBehaviour
     }
 
     private void LoadNextLevel()
-    {        
-        SceneManager.LoadScene(1);
+    {
+        int currentBuildIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextBuildIndex = currentBuildIndex + 1;
+
+        //if next build index is past the level count, go back to level 1
+        if (currentBuildIndex == SceneManager.sceneCountInBuildSettings - 1)
+            nextBuildIndex = 0;
+        else
+            nextBuildIndex = currentBuildIndex + 1;
+
+
+        SceneManager.LoadScene(nextBuildIndex);
     }
 
     private void LoadFirstLevel()
@@ -102,16 +138,30 @@ public class Rocket : MonoBehaviour
         }
         else
         {
-            audioSource.Stop();
-            mainEngine1Particles.Stop();
-            mainEngine2Particles.Stop();
+            StopApplyingThrust();
         }
+    }
+
+    private void StopApplyingThrust()
+    {
+        audioSource.Stop();
+        mainEngine1Particles.Stop();
+        mainEngine2Particles.Stop();
     }
 
     private void ApplyThrust()
     {
         rigidBody.AddRelativeForce(Vector3.up * fwdThrust * Time.deltaTime);
-        CurrentFuel -= fuelLossThrust;
+        
+        if (!infiniteFuel)
+        {
+            CurrentFuel -= fuelLossThrust;
+            if (CurrentFuel <= 0)
+            {
+                StartDeathSequence();
+            }
+        }
+              
 
         if (!audioSource.isPlaying)
         {
@@ -128,25 +178,24 @@ public class Rocket : MonoBehaviour
 
     private void RespondToRotateInput()
     {
-        if (CurrentFuel <= 0)
+        if (CurrentFuel > 0)
         {
-            audioSource.Stop();
-            return;
+            //Can only turn one direction
+            if (Input.GetKey(KeyCode.A))
+            {
+                RorateManually(rcsThrust * Time.deltaTime);
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                RorateManually(-rcsThrust * Time.deltaTime);
+            }
         }
+    }
 
+    private void RorateManually(float rotationThisFrame)
+    {
         rigidBody.freezeRotation = true; //take manual control of rotation        
-        float rotationThisFrame = rcsThrust * Time.deltaTime;
-
-        //Can only turn one direction
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.Rotate(Vector3.left * rotationThisFrame);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            transform.Rotate(Vector3.right * rotationThisFrame);
-        }
-
+        transform.Rotate(Vector3.left * rotationThisFrame);
         rigidBody.freezeRotation = false; //resume physics control of rotation
     }
 }
